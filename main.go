@@ -3,6 +3,7 @@ package main
 import (
   "fmt"
   "os/exec"
+  "strings"
 )
 
 
@@ -26,12 +27,19 @@ func main(){
     cmd := exec.Command("git", "log", "--pretty=format:%ad - %s", "--date=short")
 
     // Run the command and capture the output
-    output, err := cmd.CombinedOutput()
+    output, err:= cmd.Output()
     if err != nil {
         fmt.Printf("Error: %s\n", err)
         return
     }
 
-    // Print the output of the command
-    fmt.Printf("Output:\n%s\n", output)
+    output_str_arr  := strings.Split(string(output), "\n")
+
+    // make a hashmap
+    m := make(map[string]string)  
+    for _, s := range output_str_arr {
+      temp := strings.Split(s, " ")
+      m[string(temp[0])] = temp[2]
+    }
+    fmt.Println(m) 
 }
