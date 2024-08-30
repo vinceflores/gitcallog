@@ -1,0 +1,7 @@
+2024-06-28 - finish app
+2024-06-24 - initialized stripe
+2024-06-08 - fix on deleteUser
+2024-06-08 - fixing celrk webhook
+2024-06-08 - make clerk routes public
+2024-06-08 - init
+2024-06-07 - Initial commit from Create Next App

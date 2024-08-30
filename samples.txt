@@ -1,0 +1,4 @@
+git log --date="short" |  grep "Date" && git rev-list --count HEAD
+
+
+git log --pretty=format:"%ad - %s" --date=short  >  /Users/vinceflores/repos/github/go/gitlog/gitlog.txt
