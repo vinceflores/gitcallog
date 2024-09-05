@@ -29,6 +29,7 @@ type CalDataPoint struct {
 type viewDataPoint struct {
 	actual     float64
 	normalized float64
+	commits 	[]string
 }
 
 var scaleColors = []string{
@@ -113,6 +114,7 @@ func parseCalToView(calData []CalDataPoint) [52][7]viewDataPoint {
 		if x > -1 && y > -1 &&
 			x < 52 && y < 7 {
 				viewData[x][y].actual += calDataPoint.Value
+				viewData[x][y].commits = calDataPoint.CommitMessages
 		}
 	}
 
@@ -281,13 +283,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.selectedX > 0 {
 				m.selectedX--
 			}
-		case "enter", " ":
-			// Hard coded to add a new entry with value `1.0`
-			m.addCalData(
-				getIndexDate(m.selectedX, m.selectedY),
-				m.calData[m.selectedX].CommitMessages,
-				1.0)
-			m.viewData = parseCalToView(m.calData)
+		// case "enter", " ":
+		// 	// Hard coded to add a new entry with value `1.0`
+		// 	m.addCalData(
+		// 		getIndexDate(m.selectedX, m.selectedY),
+		// 		m.calData[m.selectedX].CommitMessages,
+		// 		1.0)
+		// 	m.viewData = parseCalToView(m.calData)
 
 		}
 	}
@@ -297,18 +299,17 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Model) View() string{
 	theTime := getIndexDate(m.selectedX, m.selectedY) // time.Now()
 
-	title, _ := glamour.Render(theTime.Format("# Monday, January 02, 2006"), "pink")
+	title, _ := glamour.Render(theTime.Format("Monday, January 02, 2006"), "tokyo-night")
 	s := title
 
-
-	selectedDetail := "\n\nCommits: " +
+	selectedDetail := "  Commits: " +
 		fmt.Sprint(m.viewData[m.selectedX][m.selectedY].actual) +
 		" normalized: " +
 		fmt.Sprint(m.viewData[m.selectedX][m.selectedY].normalized) +
 		"\n\n"
 
 	s += selectedDetail
-	s += "Press 'q' to quit\n\n"	
+	s += "  Press 'q' to quit\n\n"	
 	// styles 
 
 	labelStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#888888"))
@@ -388,6 +389,14 @@ func (m Model) View() string{
 		}
 		s += "\n"
 	}
+	s += "\n\n"
+
+	// list commit messages
+	commits := m.viewData[m.selectedX][m.selectedY].commits
+	s += "  - " + strings.Join(commits, "\n  - ") + "\n\n"
+				
+			
+	
 
 	return s
 }
