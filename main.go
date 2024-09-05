@@ -394,7 +394,7 @@ func (m Model) View() string{
 	// list commit messages
 	commits := m.viewData[m.selectedX][m.selectedY].commits
 	s += "  - " + strings.Join(commits, "\n  - ") + "\n\n"
-				
+	// faf		
 			
 	
 
