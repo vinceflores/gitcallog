@@ -33,14 +33,6 @@ type viewDataPoint struct {
 }
 
 var scaleColors = []string{
-	// Light Theme
-	// #ebedf0 - Less
-	// #9be9a8
-	// #40c463
-	// #30a14e
-	// #216e39 - More
-
-	// Dark Theme
 	"#161b22", // Less
 	"#0e4429",
 	"#006d32",
@@ -161,8 +153,11 @@ func getScaleColor(value float64) string {
 	// Assume it's normalized between 0.0-1.0
 	const max = 1.0
 	// const min = 0.0
-
-	return scaleColors[int((value/max)*(numColors-1))]
+	norm := (value/max)*(numColors-1) 
+	if value > 0 && value < 0.5 {
+		return scaleColors[0.5 * (numColors -1) ]
+	}
+	return scaleColors[int(norm)]
 }
   
 func getLogMap() (map[string][]string , error)  {
@@ -204,11 +199,11 @@ func getLogMap() (map[string][]string , error)  {
   return m , nil
 }
 
-func (m *Model) addCalData(date time.Time, commits []string ,  val float64) {
-	// Create new cal data point and add to cal data
-	newPoint := CalDataPoint{date, commits,  val}
-	m.calData = append(m.calData, newPoint)
-}
+// func (m *Model) addCalData(date time.Time, commits []string ,  val float64) {
+// 	// Create new cal data point and add to cal data
+// 	newPoint := CalDataPoint{date, commits,  val}
+// 	m.calData = append(m.calData, newPoint)
+// }
 /***************MODEL***************************/
 func (m Model) Init() tea.Cmd{
   return nil
@@ -298,10 +293,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m Model) View() string{
 	theTime := getIndexDate(m.selectedX, m.selectedY) // time.Now()
-
-	title, _ := glamour.Render(theTime.Format("Monday, January 02, 2006"), "tokyo-night")
+	// theme := "dark"
+	// title, _ := glamour.Render(theTime.Format("Monday, Januoary 02, 2006"), "#0f0KJJKJ")
+	title, _ := glamour.Render(theTime.Format("# Monday, January 02, 2006"), "dark")
 	s := title
-
+	// s += "  theme: " +  theme + "\n"
 	selectedDetail := "  Commits: " +
 		fmt.Sprint(m.viewData[m.selectedX][m.selectedY].actual) +
 		" normalized: " +
@@ -392,9 +388,9 @@ func (m Model) View() string{
 	s += "\n\n"
 
 	// list commit messages
-	commits := m.viewData[m.selectedX][m.selectedY].commits
-	s += "  - " + strings.Join(commits, "\n  - ") + "\n\n"
-	// faf		
+	// commits := m.viewData[m.selectedX][m.selectedY].commits
+	// s += "  - " + strings.Join(commits, "\n  - ") + "\n\n"
+	// // faf		
 			
 	
 
@@ -404,10 +400,11 @@ func (m Model) View() string{
 func main(){
   m , err := getLogMap()
   if err != nil {
+	fmt.Println("Error getting git log \n Make sure you are in a git repo")
     return 
   }
   p := tea.NewProgram(InitModel(m))
-  fmt.Println(m)
+  
   if _, err := p.Run(); err != nil {
     fmt.Printf("Alas, there's been an error: %v", err)
     os.Exit(1)

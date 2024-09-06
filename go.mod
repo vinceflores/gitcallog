@@ -1,4 +1,4 @@
-module github.com/vinceflores/gitcal
+module github.com/vinceflores/gitcallog
 
 go 1.22.2
 
