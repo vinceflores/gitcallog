@@ -21,6 +21,6 @@ Sleep 5s
 
 Type "h"
 Sleep 1s 
-Type "j" 
+Type "k" 
 
 Sleep 10s

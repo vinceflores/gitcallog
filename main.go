@@ -380,19 +380,29 @@ func (m Model) View() string{
 							getScaleColor(
 								m.viewData[i][j].normalized))).
 								Render("■")
-								// Render(' ')
 			}
 		}
 		s += "\n"
 	}
 	s += "\n\n"
 
-	// list commit messages
-	// commits := m.viewData[m.selectedX][m.selectedY].commits
-	// s += "  - " + strings.Join(commits, "\n  - ") + "\n\n"
-	// // faf		
-			
-	
+
+  s += "INSTRUCTIONS\n"
+  s += "Use arrow keys to move \nor type;\n"
+
+  s += "h - left \n"
+  s += "j - down \n"
+  s += "k - up \n"
+  s += "l - right \n"
+
+
+	// // list commit messages
+	commits := m.viewData[m.selectedX][m.selectedY].commits
+	if(len(commits) > 0 ) {
+		s+= "\nCOMMITS\n"
+		s += "  - " + strings.Join(commits, "\n  - ") + "\n\n"
+	}
+
 
 	return s
 }
