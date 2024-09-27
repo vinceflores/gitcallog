@@ -10,12 +10,13 @@ import (
 )
 
 type Model struct {
-	selectedX int
-	selectedY int
-	calData   []CalDataPoint
-	viewData  [52][7]ViewDataPoint // Hardcoded to one year for now
-
 	hc HashMapCalendar
+}
+
+func InitModel(hc HashMapCalendar) Model {
+	return Model{
+		hc: hc,
+	}
 }
 
 // updates view based on user input
@@ -27,37 +28,37 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "q":
 			return m, tea.Quit
 		case "up", "k":
-			if m.selectedY > 0 {
-				m.selectedY--
-			} else if m.selectedY == 0 && m.selectedX > 0 {
+			if m.hc.selectedY > 0 {
+				m.hc.selectedY--
+			} else if m.hc.selectedY == 0 && m.hc.selectedX > 0 {
 				// Scroll to the end of the previous week if on Sunday
 				// and not at the beginning of the calendar.
-				m.selectedY = 6
-				m.selectedX--
+				m.hc.selectedY = 6
+				m.hc.selectedX--
 			}
 
 		case "down", "j":
 			// Don't allow user to scroll beyond today
-			if m.selectedY < 6 &&
-				(m.selectedX != 51 ||
-					m.selectedY < int(time.Now().Weekday())) {
-				m.selectedY++
-			} else if m.selectedY == 6 && m.selectedX != 51 {
+			if m.hc.selectedY < 6 &&
+				(m.hc.selectedX != 51 ||
+					m.hc.selectedY < int(time.Now().Weekday())) {
+				m.hc.selectedY++
+			} else if m.hc.selectedY == 6 && m.hc.selectedX != 51 {
 				// Scroll to the beginning of next week if on Saturday
 				// and not at the end of the calendar.
-				m.selectedY = 0
-				m.selectedX++
+				m.hc.selectedY = 0
+				m.hc.selectedX++
 			}
 		case "right", "l":
 			// Don't allow users to scroll beyond today from the previous column
-			if m.selectedX < 50 ||
-				(m.selectedX == 50 &&
-					m.selectedY <= int(time.Now().Weekday())) {
-				m.selectedX++
+			if m.hc.selectedX < 50 ||
+				(m.hc.selectedX == 50 &&
+					m.hc.selectedY <= int(time.Now().Weekday())) {
+				m.hc.selectedX++
 			}
 		case "left", "h":
-			if m.selectedX > 0 {
-				m.selectedX--
+			if m.hc.selectedX > 0 {
+				m.hc.selectedX--
 			}
 
 		}
@@ -66,7 +67,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
-	theTime := m.hc.GetIndexDate(m.selectedX, m.selectedY) // time.Now()
+	theTime := m.hc.GetIndexDate(m.hc.selectedX, m.hc.selectedY) // time.Now()
 	s := "v2"
 	s += view.Title(m, theTime)
 	// selectedDetail := "  Commits: " +
@@ -76,7 +77,7 @@ func (m Model) View() string {
 	// 	"\n\n"
 
 	// s += selectedDetail
-	
+
 	// styles
 
 	labelStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#888888"))
@@ -131,11 +132,11 @@ func (m Model) View() string {
 		// Add calendar days
 		for i := 0; i < 52; i++ {
 			// Selected Item
-			if m.selectedX == i && m.selectedY == j {
+			if m.hc.selectedX == i && m.hc.selectedY == j {
 				s += boxSelectedStyle.Copy().Foreground(
 					lipgloss.Color(
 						getScaleColor(
-							m.viewData[i][j].normalized))).
+							m.hc.viewData[i][j].normalized))).
 					Render("■")
 			} else if i == 51 &&
 				j > int(time.Now().Weekday()) {
@@ -149,7 +150,7 @@ func (m Model) View() string {
 					Foreground(
 						lipgloss.Color(
 							getScaleColor(
-								m.viewData[i][j].normalized))).
+								m.hc.viewData[i][j].normalized))).
 					Render("■")
 			}
 		}
@@ -163,7 +164,7 @@ func (m Model) View() string {
 	s += "[{h:left}, {j:down}, {k:up}, {l:right}]\n"
 
 	// // list commit messages
-	commits := m.viewData[m.selectedX][m.selectedY].commits
+	commits := m.hc.viewData[m.hc.selectedX][m.hc.selectedY].commits
 
 	if len(commits) > 0 {
 		s += "\nCOMMITS\n"

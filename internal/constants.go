@@ -8,8 +8,3 @@ var ScaleColors = []string{
 	"#39d353", // - More
 }
 
-type ViewDataPoint struct {
-	actual     float64
-	normalized float64
-	commits    []string
-}
